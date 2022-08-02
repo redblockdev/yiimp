@@ -634,6 +634,50 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 		return;
 	}
 
+	else if(strcmp(coind->symbol, "VKAX") == 0)
+	{
+		char payees[4];
+		int npayees = 1;
+		char script_dests[4096] = { 0 };
+
+		json_value* masternode = json_get_object(json_result, "masternode");
+		debuglog("VKAX DETECTED Json: RESULT %s\n", masternode);
+		bool masternode_started = json_get_bool(json_result, "masternode_payments_started");
+		if (masternode_started && masternode)
+		{
+			for(int i = 0; i < masternode->u.array.length; i++)
+			{
+				const char *payee = json_get_string(masternode->u.array.values[i], "payee");
+				json_int_t amount = json_get_int(masternode->u.array.values[i], "amount");
+				if (payee && amount) 
+				{
+					char script_payee[128] = { 0 };
+					npayees++;
+					available -= amount;
+					base58_decode(payee, script_payee);
+					job_pack_tx(coind, script_dests, amount, script_payee);
+				}
+				debuglog("MASTERNODE DETECTED Payee: %s\n", payee);
+			}
+		}
+
+		sprintf(payees, "%02x", npayees);
+		strcat(templ->coinb2, payees);
+		strcat(templ->coinb2, script_dests);
+		job_pack_tx(coind, templ->coinb2, available, NULL);
+		strcat(templ->coinb2, "00000000"); // locktime
+		if(coinbase_payload && strlen(coinbase_payload) > 0) 
+		{
+			char coinbase_payload_size[18];
+			ser_compactsize((unsigned int)(strlen(coinbase_payload) >> 1), coinbase_payload_size);
+			strcat(templ->coinb2, coinbase_payload_size);
+			strcat(templ->coinb2, coinbase_payload);
+		}
+
+		coind->reward = (double)available / 100000000 * coind->reward_mul;
+		return;
+	}
+	
 	else if(strcmp(coind->symbol, "IDX") == 0)
 	{
 		char script_dests[2048] = { 0 };

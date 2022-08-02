@@ -86,6 +86,7 @@ function yaamp_get_algos()
 		'm7m',
 		'megabtx',
 		'megamec',
+		'mike',
 		'minotaur',
 		'minotaurx',
 		'phi',
@@ -151,6 +152,8 @@ function yaamp_algo_mBTC_factor($algo)
 		return 0.001;
 	case 'gr':
 		return 0.001;
+	case 'mike':
+		return 0.001;
 	case 'yespowerARWN':
 		return 0.001;
 	case 'vanilla':
@@ -184,6 +187,7 @@ function yaamp_get_algo_norm($algo)
 		'gr'		=> 0.001,
 		'yespowerARWN'		=> 0.001,
 		'myr-gr'	=> 1.0,
+		'mike'		=> 0.001,
 		'nist5'		=> 1.0,
 		'neoscrypt'	=> 1.0,
 		'quark'		=> 1.0,
@@ -274,6 +278,7 @@ function getAlgoColors($algo)
 		'm7m'		=> '#d0a0a0',
 		'megabtx'	=> '#d0f0a0',
 		'megamec'	=> '#d0f0a0',
+		'mike'		=> '#d0f0a0',
 		'minotaur'	=> '#d0f0a0',
 		'minotaurx'	=> '#d0f0a0',
 		'penta'		=> '#80c0c0',
@@ -471,6 +476,7 @@ function getAlgoPort($algo)
 		'minotaurx'	=> 7019,
 		'megabtx'	=> 7066,
 		'megamec'	=> 7067,
+		'mike'		=> 7079,
 		
 		'astralhash'   	=> 8640,
 		'globalhash'   	=> 8650,
