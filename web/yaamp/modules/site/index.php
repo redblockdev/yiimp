@@ -68,9 +68,10 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600) . " hours";
 			<select id="drop-stratum" colspan="2" style="min-width: 140px; border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
 
 			<!-- Add your stratum locations here -->
-			<option value="asia.">Asia Stratum</option>
-			<option value="na.">North America Stratum</option>
-			<!--	<option value="cad.">CAD Stratum</option>
+			<option value="">Mian Stratum</option>
+			<!--	<option value="asia.">Asia Stratum</option>
+			<!--	<option value="na.">North America Stratum</option>
+			<option value="cad.">CAD Stratum</option>
 			<option value="uk.">UK Stratum</option> -->
 			</select>
 		</td>
@@ -141,7 +142,7 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600) . " hours";
 		</td>
 	</tr>
 	<tr>
-			<td colspan="5"><p class="main-left-box" style="padding: 3px; background-color: #ffffee; font-family: monospace;" id="output">-a  -o stratum+tcp://YAAMP_STRATUM_URL:0000 -u . -p c=</p>
+			<td colspan="5"><p class="main-left-box" style="padding: 3px; background-color: #ffffee; font-family: monospace;" id="output">-a  -o stratum+tcp://<?=YAAMP_STRATUM_URL?>:0000 -u . -p c=</p>
 		</td>
 	</tr>
 </tbody>
@@ -268,7 +269,7 @@ function getLastUpdated(){
     var result = '';
 
     result += coin.options[coin.selectedIndex].dataset.algo + ' -o stratum+tcp://';
-    result += stratum.value + '<?=YAAMP_SITE_URL?>:';
+    result += stratum.value + '<?=YAAMP_STRATUM_URL?>:';
     result += coin.options[coin.selectedIndex].dataset.port + ' -u ';
     result += document.getElementById('text-wallet').value;
     if (rigName) result += '.' + rigName;
