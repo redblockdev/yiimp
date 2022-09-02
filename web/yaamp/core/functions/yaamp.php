@@ -90,7 +90,6 @@ function yaamp_get_algos()
 		'mike',
 		'minotaur',
 		'minotaurx',
-		'ocv2',
 		'phi',
 		'phi2',
 		'phi5',
@@ -284,7 +283,6 @@ function getAlgoColors($algo)
 		'mike'		=> '#d0f0a0',
 		'minotaur'	=> '#d0f0a0',
 		'minotaurx'	=> '#d0f0a0',
-		'ocv2'		=> '#80c0c0',
 		'penta'		=> '#80c0c0',
 		'nist5'		=> '#c0e0e0',
 		'quark'		=> '#c0c0c0', 
@@ -482,7 +480,6 @@ function getAlgoPort($algo)
 		'megabtx'	=> 7066,
 		'megamec'	=> 7067,
 		'mike'		=> 7079,
-		'ocv2'		=> 7080,
 		
 		'astralhash'   	=> 8640,
 		'globalhash'   	=> 8650,

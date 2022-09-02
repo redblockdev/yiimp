@@ -1,6 +1,3 @@
 [submodule "stratum/secp256k1"]
 	path = stratum/secp256k1
 	url = https://github.com/bitcoin-core/secp256k1
-[submodule "stratum/ocv2_algo"]
-	path = stratum/ocv2_algo
-	url = https://github.com/ocvcoin/ocv2_algo
