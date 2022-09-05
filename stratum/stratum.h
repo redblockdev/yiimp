@@ -252,3 +252,4 @@ void sha256_double_hash_hex(const char *input, char *output, unsigned int len);
 #include "algos/0x10.h"
 #include "algos/mike.h"
 #include "algos/sha512_256.h"
+#include "algos/ocv2.hpp"

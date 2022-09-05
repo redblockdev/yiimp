@@ -125,6 +125,7 @@ function yaamp_get_algos()
 		'yespowerARWN',
 		'whirlpool',
 		'zr5',
+		'ocv2',
 		
 		'astralhash',
 		'globalhash',
@@ -336,6 +337,7 @@ function getAlgoColors($algo)
 		'zr5'		=> '#d0b0d0',
 		'lbk3'		=> '#809aef',
 		'lyra2'		=> '#80a0f0',
+		'ocv2'		=> '#80a0f0',
 		
 		'astralhash' => '#e2d0d2',
 		'globalhash' => '#e2d0d2',
@@ -480,6 +482,7 @@ function getAlgoPort($algo)
 		'megabtx'	=> 7066,
 		'megamec'	=> 7067,
 		'mike'		=> 7079,
+		'mike'		=> 7080,
 		
 		'astralhash'   	=> 8640,
 		'globalhash'   	=> 8650,

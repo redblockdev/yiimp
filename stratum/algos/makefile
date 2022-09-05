@@ -4,7 +4,7 @@ CC=gcc -g -ggdb
 #CFLAGS=-c -g -I /usr/include/mysql
 #LDFLAGS=-g
 
-CXXFLAGS = -O2 -I.. -march=native
+CXXFLAGS = -O2 -I.. -march=native -pipe  -I../ocv2_algo/dependencies/sha `env PKG_CONFIG_LIBDIR=../ocv2_algo/dependencies/opencv/this-system-release/lib/pkgconfig pkg-config --static --cflags --libs opencv` -std=c++11 
 CFLAGS= $(CXXFLAGS) -std=gnu99
 LDFLAGS=-O2 -lgmp
 
@@ -28,7 +28,7 @@ SOURCES=lyra2re.c lyra2v2.c Lyra2.c lyra2z.c lyra2z330.c Lyra2-z.c Sponge.c alli
 	cryptonote/cryptonight_dark.c cryptonote/cryptonight_dark_lite.c cryptonote/cryptonight_fast.c \
 	cryptonote/cryptonight_lite.c cryptonote/cryptonight_soft_shell.c cryptonote/cryptonight_turtle.c \
 	cryptonote/cryptonight_turtle_lite.c anime.c \
-	heavyhash/heavyhash.c heavyhash/keccak_tiny.c cosa.c 0x10.c mike.c sha512_256.c
+	heavyhash/heavyhash.c heavyhash/keccak_tiny.c cosa.c 0x10.c mike.c sha512_256.c ocv2.cpp
 	
 OBJECTS=$(SOURCES:%.c=%.o) $(SOURCES:%.cpp=%.o) $(SOURCES:%.cc=%.o)
 OUTPUT=libalgos.a
