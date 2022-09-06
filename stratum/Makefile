@@ -9,7 +9,7 @@ SQLFLAGS= `mysql_config --cflags --libs`
 CFLAGS += -DNO_EXCHANGE
 
 #CFLAGS=-c -O2 -I /usr/include/mysql
-LDFLAGS=-O2 `mysql_config --libs`   -Iocv2_algo/dependencies/sha `env PKG_CONFIG_LIBDIR=ocv2_algo/dependencies/opencv/this-system-release/lib/pkgconfig pkg-config --static --cflags --libs opencv` -std=c++11   
+LDFLAGS=-O2 `mysql_config --libs`
 
 LDLIBS=iniparser/libiniparser.a algos/libalgos.a sha3/libhash.a -Isecp256k1/include secp256k1/.libs/libsecp256k1.a -lpthread -lgmp -lm -lstdc++ -lssl -lcrypto 
 LDLIBS+=-lmysqlclient
@@ -27,19 +27,18 @@ LDFLAGS += $(LDCURL)
 OBJECTS=$(SOURCES:.cpp=.o)
 OUTPUT=stratum
 
-CODEDIR1=ocv2_algo
-CODEDIR2=algos
-CODEDIR3=sha3
-CODEDIR4=iniparser
-CODEDIR5=secp256k1
+CODEDIR1=algos
+CODEDIR2=sha3
+CODEDIR3=iniparser
+CODEDIR4=secp256k1
 
 
-.PHONY: projectcode1 projectcode2 projectcode3 projectcode4 projectcode5
+.PHONY: projectcode1 projectcode2 projectcode3 projectcode4
 
-all: projectcode1 projectcode2 projectcode3 projectcode4 projectcode5 $(SOURCES) $(OUTPUT)
+all: projectcode1 projectcode2 projectcode3 projectcode4 $(SOURCES) $(OUTPUT)
 
 projectcode1:
-	git submodule init && git submodule update && cd $(CODEDIR1) && echo 1 | sudo bash build.sh 
+	git submodule init && git submodule update && $(MAKE) -C $(CODEDIR1)
 
 projectcode2:
 	$(MAKE) -C $(CODEDIR2)
@@ -48,10 +47,7 @@ projectcode3:
 	$(MAKE) -C $(CODEDIR3)
 
 projectcode4:
-	$(MAKE) -C $(CODEDIR4)
-
-projectcode5:
-	cd $(CODEDIR5) && chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && $(MAKE)
+	cd $(CODEDIR4) && chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && $(MAKE)
 
 $(SOURCES): stratum.h util.h
 

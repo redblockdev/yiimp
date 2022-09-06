@@ -171,7 +171,6 @@ YAAMP_ALGO g_algos[] =
 	{"myr-gr", groestlmyriad_hash, 1, 0, 0}, /* groestl + sha 64 */
 	{"neoscrypt", neoscrypt_hash, 0x10000, 0, 0},
 	{"nist5", nist5_hash, 1, 0, 0},
-	{"ocv2", ocv2_hash, 1, 0, 0},
 	{"pawelhash", pawelhash_hash, 0x100, 0, 0},
 	{"penta", penta_hash, 1, 0, 0},
 	{"phi", phi_hash, 1, 0, 0},
@@ -266,9 +265,6 @@ int main(int argc, char **argv)
 		printf("usage: %s <algo>\n", argv[0]);
 		return 1;
 	}
-
-	if(ocv2_test_algo() != true)
-		cerr << endl << "Error!! ocv2_test_algo() failed." << endl;
 
 	srand(time(NULL));
 	getifaddrs(&g_ifaddr);
