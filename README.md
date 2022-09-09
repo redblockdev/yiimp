@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Kudaraidee/yiimp.svg?branch=dev)](https://travis-ci.org/Kudaraidee/yiimp)
+[![Build Status](https://travis-ci.com/Kudaraidee/yiimp.svg?branch=dev)](https://travis-ci.com/Kudaraidee/yiimp)
 
 #yiimp - yaamp fork
 
