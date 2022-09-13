@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/Kudaraidee/yiimp.svg?branch=dev)](https://travis-ci.com/Kudaraidee/yiimp)
-
 #yiimp - yaamp fork
 
 Required:
