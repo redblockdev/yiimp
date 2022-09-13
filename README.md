@@ -109,7 +109,11 @@ and in the lighttpd config file:
 
 And finally remove the IP filter check in SiteController.php
 
+Using MySQLTuner:
 
+sudo apt-get install mysqltuner
+wait at least 24h
+in cli: mysqltuner
 
 There are logs generated in the /var/stratum folder and /var/log/stratum/debug.log for the php log.
 
