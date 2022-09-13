@@ -39,6 +39,7 @@ require_once("cryptowatch.php");
 require_once("stocksexchange.php");
 require_once("tradeogre.php");
 require_once("tradesatoshi.php");
+require_once("txbit.php");
 require_once("swiftex.php");
 require_once("unnamed.php");
 require_once("bibox.php");

@@ -272,6 +272,22 @@ function updateRawCoinExchange($marketname)
 				}
 			}
 		break;
+		case 'txbit':
+			if (!exchange_get('txbit', 'disabled')) {
+				$list = txbit_api_query('public/getcurrencies');
+				if(isset($list->result) && !empty($list->result))
+				{
+					dborun("UPDATE markets SET deleted=true WHERE name='txbit'");
+					foreach($list->result as $currency) {
+						if ($currency->Currency == 'BTC') {
+							exchange_set('txbit', 'withdraw_fee_btc', $currency->TxFee);
+							continue;
+						}
+						updateRawCoin('txbit', $currency->Currency, $currency->CurrencyLong);
+					}
+				}
+			}
+		break;
 		case 'bitz':
 			if (!exchange_get('bitz', 'disabled')) {
 				$list = bitz_api_query('tickerall');
