@@ -1,11 +1,19 @@
-#yiimp - yaamp fork
+<h1 align="center"> Yiimp - Yaamp Fork </h1>
 
-Required:
+<h3 align="left"> Requirements </h3>
 
-	linux, mysql, php, memcached, a webserver (lighttpd or nginx recommended)
+* Linux
+* Mysql
+* Php 7.3
+* Memcached
+* Nginx (Recommended)
+    - You can also use lighttpd or apache
 
+<h2 align="left"> Configuration</h2>
+<h3 align="center">Nginx </h3>
 
-Config for nginx:
+Use this Config on nginx:
+
 
 	location / {
 		try_files $uri @rewrite;
@@ -22,15 +30,18 @@ Config for nginx:
 	}
 
 
-If you use apache, it should be something like that (already set in web/.htaccess):
+<h3 align="center"> Apache </h3>
+
+It should be something like that (already set in web/.htaccess):
 
 	RewriteEngine on
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^(.*) index.php?r=$1 [QSA]
 
+<h3 align="center"> Lighttpd </h3>
 
-If you use lighttpd, use the following config:
+use the following config:
 
 	$HTTP["host"] =~ "yiimp.ccminer.org" {
 	        server.document-root = "/var/yaamp/web"
@@ -44,6 +55,7 @@ If you use lighttpd, use the following config:
 		url.access-deny = ( "~", ".dat", ".log" )
 	}
 
+<h2 align="left"> Setup Instructions </h2>
 
 For the database, import the initial dump present in the sql/ folder
 
