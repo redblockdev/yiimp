@@ -98,6 +98,29 @@ function updateRawCoinExchange($marketname)
 			}
 		break;
 
+		case 'exbitron':
+			if (!exchange_get($marketname, 'disabled')) 
+			{
+				$list = exbitron_api_query('markets');
+				if(is_array($list) && !empty($list))
+				{
+					// debuglog(json_encode($list));
+					dborun("UPDATE markets SET deleted=true WHERE name='$marketname'");
+					foreach($list as $key=>$data) {
+						// debuglog(json_encode($data));
+						$e = explode("/",$data->name);
+						// debuglog(json_encode($e));
+						$base = $e[1];
+						if (strtoupper($base) !== 'BTC'||strtoupper($base) !== 'USDT')
+							continue;
+						$symbol = strtoupper($e[0]);
+						// debuglog($symbol);
+						updateRawCoin($marketname, $symbol);
+					}
+				}
+			}
+		break;
+
 		case 'occe':
 			if (!exchange_get($marketname, 'disabled')) 
 			{

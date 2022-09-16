@@ -84,6 +84,9 @@ function BackendPricesUpdateExchange($exchangename)
 		case 'altmarkets':
 			updateAltMarketsMarkets();
 		break;
+		case 'exbitron':
+			updateExbitronMarkets();
+		break;
 		case 'occe':
 			updateOCCEMarkets();
 		break;
@@ -357,6 +360,74 @@ function updateAltMarketsMarkets() {
 	if(empty($list) || !is_array($list)) return;
 	// debuglog(json_encode($list));
 	$tickers = altmarkets_api_query('markets/tickers');
+	foreach($list as $data) {
+		$e = explode('/', $data->name);
+		$symbol = strtoupper($e[0]); $base = strtoupper($e[1]);
+		if($base != 'BTC') continue;
+		// debuglog("$symbol : $base");
+		$id = $data->id;
+
+		$coin = getdbosql('db_coins', "symbol=:sym", array(':sym'=>$symbol));
+		if(!$coin) continue;
+		$market = getdbosql('db_markets', "coinid={$coin->id} AND name='$exchange' AND IFNULL(base_coin,'') IN ('','BTC')");
+		$symbol = $coin->getOfficialSymbol();
+		if(!$market)
+		{
+			//debuglog ("$symbol not found in db");
+			$market = new db_markets;
+			$market->coinid = $coin->id;
+			$market->disabled = 0;
+			$market->deleted = 0;
+			$market->name = $exchange;
+			//continue;	
+		}
+		else
+		{
+			//debuglog ("$symbol found in db");
+			$symbol = $coin->getOfficialSymbol();
+			if (market_get($exchange, $symbol, "disabled")) {
+				$market->disabled = 1;
+				$market->message = 'disabled from settings';
+				$market->save();
+				continue;
+			}
+		}
+		$ticker = $tickers->$id;
+		// debuglog(json_encode($ticker));
+		$data = $ticker->ticker;
+		$bid = bitcoinvaluetoa($data->low);
+		$ask = bitcoinvaluetoa($data->high);
+		$market->disabled = ($bid == 0);
+		$price2 = ((double)$ask + (double)$bid)/2;
+		//debuglog($symbol. ' : ' .$price2);
+		$market->price2 = AverageIncrement($market->price2, $price2);
+		$market->price = AverageIncrement($market->price, (double)$bid);
+		$market->priority = -1; // not ready for trading
+		$market->txfee = 0.2;
+		debuglog("$exchange: $symbol price set to ".bitcoinvaluetoa($market->price));
+		$market->pricetime = time(); // $m->updated_time;
+		$market->save();
+		if (!empty($market->price2))
+		{
+			if ((empty($coin->price2))||($coin->price2==0)) {
+				$coin->price = $market->price;
+				$coin->price2 = $market->price2;
+				$coin->save();
+			}
+		}
+	}
+}
+
+function updateExbitronMarkets() {
+	debuglog(__FUNCTION__);
+	
+	$exchange = 'exbitron';
+	debuglog ("====== $exchange =======");
+	if (exchange_get($exchange, 'disabled')) return;
+	$list = exbitron_api_query('markets');
+	if(empty($list) || !is_array($list)) return;
+	// debuglog(json_encode($list));
+	$tickers = exbitron_api_query('markets/tickers');
 	foreach($list as $data) {
 		$e = explode('/', $data->name);
 		$symbol = strtoupper($e[0]); $base = strtoupper($e[1]);
