@@ -11,6 +11,8 @@ function BackendBlockNew($coin, $db_block)
 	
 	if ($is_solo == 0)
 	{
+		debuglog("Shared Mining Found Block : $coin->id height $db_block->height with $db_block->userid");
+
 		//Clear Share Solo Miner before calc
 		$solo_workers = getdbolist('db_workers',"algo=:algo and password like '%m=solo%'", 
 				array(':algo'=>$db_block->algo));
@@ -77,6 +79,9 @@ function BackendBlockNew($coin, $db_block)
 
 			$user->last_earning = time();
 			$user->save();
+
+			$db_block->solo = 0;
+			$db_block->save();
 		}
 	}
 	else
