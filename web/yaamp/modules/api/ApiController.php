@@ -154,6 +154,7 @@ class ApiController extends CommonController
                 $last_solo     = dborow("SELECT height, time FROM blocks " . "WHERE coin_id=:id AND solo=1 AND category IN ('immature','generate') ORDER BY height DESC LIMIT 1", array(
                     ':id' => $coin->id
                 ));
+
                 $lastblock     = (int) arraySafeVal($last, 'height');
                 $lastblock_shares   = (int) arraySafeVal($last_shares, 'height');
                 $lastblock_solo     = (int) arraySafeVal($last_solo, 'height');
@@ -173,10 +174,10 @@ class ApiController extends CommonController
                 $workers = (int) dboscalar("SELECT count(W.userid) AS workers FROM workers W " . "INNER JOIN accounts A ON A.id = W.userid " . "WHERE W.algo=:algo AND A.coinid IN (:id, 6)", // 6: btc id
                     array(':algo' => $coin->algo,':id' => $coin->id));
 				
-				$workers_shared = (int) dboscalar("SELECT count(W.userid) AS workers FROM workers W " . "INNER JOIN accounts A ON A.id = W.userid " . "WHERE W.algo=:algo AND A.coinid IN (:id, 6) and not password like '%m=solo%'", // 6: btc id
+		$workers_shared = (int) dboscalar("SELECT count(W.userid) AS workers FROM workers W " . "INNER JOIN accounts A ON A.id = W.userid " . "WHERE W.algo=:algo AND A.coinid IN (:id, 6) and not password like '%m=solo%'", // 6: btc id
                     array(':algo' => $coin->algo,':id' => $coin->id));
 
-				$workers_solo = (int) dboscalar("SELECT count(W.userid) AS workers FROM workers W " . "INNER JOIN accounts A ON A.id = W.userid " . "WHERE W.algo=:algo AND A.coinid IN (:id, 6)and password like '%m=solo%'", // 6: btc id
+		$workers_solo = (int) dboscalar("SELECT count(W.userid) AS workers FROM workers W " . "INNER JOIN accounts A ON A.id = W.userid " . "WHERE W.algo=:algo AND A.coinid IN (:id, 6)and password like '%m=solo%'", // 6: btc id
                     array(':algo' => $coin->algo,':id' => $coin->id));
 
                 $since  = $timelast ? $timelast : time() - 60 * 60;
@@ -194,7 +195,6 @@ class ApiController extends CommonController
                 // Coin hashrate, we only store the hashrate per algo in the db,
                 // we need to compute the % of the coin compared to others with the same algo
                 if ($workers > 0) {
-
                     $algohr        = (double) dboscalar("SELECT SUM(difficulty) AS algo_hr FROM shares WHERE time>$since AND algo=:algo", array(':algo' => $coin->algo));
                     $factor        = ($algohr > 0 && !empty($shares)) ? (double) $shares['coin_hr'] / $algohr : 1.;
                     $algo_hashrate = controller()->memcache->get_database_scalar("api_status_hashrate-{$coin->algo}", "SELECT hashrate FROM hashrate WHERE algo=:algo ORDER BY time DESC LIMIT 1", array(':algo' => $coin->algo));
@@ -213,39 +213,41 @@ class ApiController extends CommonController
                 $min_ttf      = $coin->network_ttf > 0 ? min($coin->actual_ttf, $coin->network_ttf) : $coin->actual_ttf;
                 $network_hash = $coin->difficulty * 0x100000000 / ($min_ttf ? $min_ttf : 60);
 
-				$fees = yaamp_fee($coin->algo);
-				$fees_solo = yaamp_fee_solo($coin->algo);
-				$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $coin->algo,':symbol' => $coin->symbol));
+		$fees = yaamp_fee($coin->algo);
+		$fees_solo = yaamp_fee_solo($coin->algo);
+		$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $coin->algo,':symbol' => $coin->symbol));
 
+		$min_payout = max(floatval(YAAMP_PAYMENTS_MINI), floatval($coin->payout_min));
+		
                 $data[$symbol] = array(
-                    'algo' => $coin->algo,
-					'port' => $port_db->port,
-					'name' => $coin->name,
-                    'reward' => $coin->reward,
-                    'height' => (int) $coin->block_height,
-                    'difficulty' => $coin->difficulty,
-					'fees' => (double) $fees,
-					'fees_solo' => (double) $fees_solo,
-                    'workers' => $workers,
-                    'workers_shared' => $workers_shared,
-                    'workers_solo' => $workers_solo,
-                    'shares' => (int) arraySafeVal($shares, 'shares'),
-                    'hashrate' => round($factor * $algo_hashrate),
-                    //'hashrate_shared' => round($factor * $algo_hashrate_shared),
-                    //'hashrate_solo' => round($factor * $algo_hashrate_solo),
-                    'network_hashrate' => $network_hash,
-                    'estimate' => $btcmhd,
-                    //'percent' => round($factor * 100, 1),
-                    '24h_blocks' => (int) arraySafeVal($res24h, 'a'),
-                    '24h_btc' => round(arraySafeVal($res24h, 'b', 0), 8),
-                    'lastblock' => $lastblock,
-                    'lastblock_shares' => $lastblock_shares,
-                    'lastblock_solo' => $lastblock_solo,
-                    'timesincelast' => $timesincelast,
-					'timesincelast_shares' => $timesincelast_shares,
-					'timesincelast_solo' => $timesincelast_solo
-					
-                );
+                	'algo' => $coin->algo,
+			'port' => $port_db->port,
+			'name' => $coin->name,
+                	'reward' => $coin->reward,
+                	'minimumPayment' => $min_payout,
+			'height' => (int) $coin->block_height,
+                	'difficulty' => $coin->difficulty,
+			'fees' => (double) $fees,
+			'fees_solo' => (double) $fees_solo,
+                	'workers' => $workers,
+                	'workers_shared' => $workers_shared,
+                	'workers_solo' => $workers_solo,
+                	'shares' => (int) arraySafeVal($shares, 'shares'),
+                	'hashrate' => round($factor * $algo_hashrate),
+                    	//'hashrate_shared' => round($factor * $algo_hashrate_shared),
+                    	//'hashrate_solo' => round($factor * $algo_hashrate_solo),
+                    	'network_hashrate' => $network_hash,
+                    	'estimate' => $btcmhd,
+                    	//'percent' => round($factor * 100, 1),
+                    	'24h_blocks' => (int) arraySafeVal($res24h, 'a'),
+                    	'24h_btc' => round(arraySafeVal($res24h, 'b', 0), 8),
+                    	'lastblock' => $lastblock,
+                    	'lastblock_shares' => $lastblock_shares,
+                    	'lastblock_solo' => $lastblock_solo,
+                    	'timesincelast' => $timesincelast,
+		    	'timesincelast_shares' => $timesincelast_shares,
+		    	'timesincelast_solo' => $timesincelast_solo
+		);
 
                 if (!empty($coin->symbol2))
                     $data[$symbol]['symbol'] = $coin->symbol2;
