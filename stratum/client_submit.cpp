@@ -35,21 +35,43 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 #ifdef MERKLE_DEBUGLOG
 	printf("merkle root %s\n", merkleroot.c_str());
 #endif
-	if (!strcmp(g_stratum_algo, "lbry")) {
+	if (!strcmp(g_stratum_algo, "lbry")) 
+	{
 		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			templ->claim_be, ntime, templ->nbits, nonce);
 		ser_string_be(submitvalues->header, submitvalues->header_be, 112/4);
-	} else if (strlen(templ->extradata_be) == 128) { // LUX SC
+	} 
+	else if (strlen(templ->extradata_be) == 128) 
+	{ // LUX SC
 		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			ntime, templ->nbits, nonce, templ->extradata_be);
 		ser_string_be(submitvalues->header, submitvalues->header_be, 36); // 80+64 / sizeof(u32)
-	} else if (templ->needpriceinfo)
+	} 
+	else if (templ->needpriceinfo)
 	{
 		sprintf(submitvalues->header, "%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			ntime, templ->nbits, nonce);
 		ser_string_be(submitvalues->header, submitvalues->header_be, 20);
 		sprintf(submitvalues->header_be, "%s%s", submitvalues->header_be, templ->priceinfo);
-	} else
+	} 
+	else if (!strcmp(g_stratum_algo, "neoscrypt-xaya")) 
+	{
+ 	    sprintf(submitvalues->xaya_header, "%s%s%s", templ->xaya_header, nonce1, nonce2);
+
+        int xaya_header_len = strlen(submitvalues->xaya_header);
+        binlify(submitvalues->xaya_header_bin, submitvalues->xaya_header);
+        char xaya_merkle[128];
+        memset(xaya_merkle, 0, 128);
+        sha256_double_hash_hex((char *)submitvalues->xaya_header_bin, (char *)xaya_merkle, xaya_header_len/2);
+
+        sprintf(submitvalues->header, "%s%s%s%s%s%s", "20000000",
+                "0000000000000000000000000000000000000000000000000000000000000000", xaya_merkle, ntime, templ->nbits,
+                nonce);
+
+        ser_string_be(submitvalues->header, submitvalues->header_be, 20);
+
+    }
+	else
 	{
 		sprintf(submitvalues->header, "%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			ntime, templ->nbits, nonce);
@@ -241,10 +263,16 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 		{
 			sprintf(block_hex, "%s%s%s%s", submitvalues->header_be, "0000000000000000000000000000000000000000000000000000000000000000", count_hex, submitvalues->coinbase);
 		} 
+		else if(!strcmp(g_stratum_algo, "neoscrypt-xaya")) 
+		{
+            string_be(templ->nbits,&templ->xaya_nbits[0]);
+            sprintf(block_hex, "%s02%s%s%s%s", submitvalues->xaya_header, templ->xaya_nbits,
+                    submitvalues->header, count_hex, templ->xaya_coinbase);
+        } 
 		else 
 		{
-			sprintf(block_hex, "%s%s%s", submitvalues->header_be, count_hex, submitvalues->coinbase);
-		}
+            sprintf(block_hex, "%s%s%s", submitvalues->header_be, count_hex, submitvalues->coinbase);
+        }
 
 		if (g_current_algo->name && !strcmp("jha", g_current_algo->name)) {
 			// block header of 88 bytes
@@ -284,7 +312,14 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 			//if (g_current_algo->merkle_func)
 			//	merkle_hash = g_current_algo->merkle_func;
 
-			merkle_hash((char *)submitvalues->header_bin, doublehash2, strlen(submitvalues->header_be)/2);
+			if(!strcmp(g_stratum_algo, "neoscrypt-xaya")) 
+			{
+                merkle_hash((char *) submitvalues->xaya_header_bin, doublehash2, strlen(submitvalues->header_be) / 2);
+            } 
+			else 
+			{
+                merkle_hash((char *) submitvalues->header_bin, doublehash2, strlen(submitvalues->header_be) / 2);
+            }
 
       // isnt perfect, but it works
  //     if(strcmp(coind->symbol, "SIN") == 0)
