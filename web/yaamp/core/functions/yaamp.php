@@ -274,7 +274,7 @@ function getAlgoColors($algo)
 		'keccakc'	=> '#c0f0c0',
 		'heavyhash'	=> '#c0f0c0',
 		'hex'		=> '#c0f0c0',
-		'honeycomb'		=> '#c0f0c0',
+		'honeycomb'	=> '#c0f0c0',
 		'lbry'		=> '#b0d0e0',
 		'luffa'		=> '#a0c0c0',
 		'm7m'		=> '#d0a0a0',
@@ -639,6 +639,38 @@ function yaamp_pool_rate($algo=null)
 	return $rate;
 }
 
+function yaamp_pool_shared_rate($algo=null)
+{
+	if(!$algo) $algo = user()->getState('yaamp-algo');
+
+	$target = yaamp_hashrate_constant($algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$shared_workers = getdbolist('db_workers', "algo=:algo and password not like '%m=solo%'", array(':algo'=>$algo));
+	foreach ($shared_workers as $shared_worker)
+	{
+		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$shared_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_pool_shared_rate-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND algo=:algo AND solo=0", array(':algo'=>$algo));
+	return $rate;
+}
+
+function yaamp_pool_solo_rate($algo=null)
+{
+	if(!$algo) $algo = user()->getState('yaamp-algo');
+
+	$target = yaamp_hashrate_constant($algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$solo_workers = getdbolist('db_workers', "algo=:algo and password like '%m=solo%'", array(':algo'=>$algo));
+	foreach ($solo_workers as $solo_worker)
+	{
+		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$solo_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_pool_solo_rate-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND algo=:algo AND solo=1", array(':algo'=>$algo));
+	return $rate;
+}
+
 function yaamp_pool_rate_bad($algo=null)
 {
 	if(!$algo) $algo = user()->getState('yaamp-algo');
@@ -678,6 +710,38 @@ function yaamp_user_rate($userid, $algo=null)
 	$rate = controller()->memcache->get_database_scalar("yaamp_user_rate-$userid-$algo",
 		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo", array(':algo'=>$algo));
 
+	return $rate;
+}
+
+function yaamp_user_shared_rate($userid, $algo=null)
+{
+	if(!$algo) $algo = user()->getState('yaamp-algo');
+
+	$target = yaamp_hashrate_constant($algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$shared_workers = getdbolist('db_workers', "userid=$userid AND algo=:algo and password not like '%m=solo%'", array(':algo'=>$algo));
+	foreach ($shared_workers as $shared_worker)
+	{
+		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$shared_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_user_shared_rate-$userid-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo AND solo=0", array(':algo'=>$algo));
+	return $rate;
+}
+
+function yaamp_user_solo_rate($userid, $algo=null)
+{
+	if(!$algo) $algo = user()->getState('yaamp-algo');
+
+	$target = yaamp_hashrate_constant($algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$solo_workers = getdbolist('db_workers', "userid=$userid AND algo=:algo and password like '%m=solo%'", array(':algo'=>$algo));
+	foreach ($solo_workers as $solo_worker)
+	{
+		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$solo_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_user_solo_rate-$userid-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo AND solo=1", array(':algo'=>$algo));
 	return $rate;
 }
 
