@@ -29,6 +29,11 @@ Use this Config on nginx:
 		include fastcgi_params;
 	}
 
+	location ^~ /list-algos/ {
+		deny all;
+		access_log off;
+		return 301 https://$server_name;
+	}
 
 <h3 align="center"> Apache </h3>
 
@@ -56,6 +61,11 @@ use the following config:
 	}
 
 <h2 align="left"> Setup Instructions </h2>
+
+after create Symlinks 
+ln -s /<path to stratum/config to be linked> <path of the link /var/web/list-algos to be created>
+example:
+ln -s /var/stratum/config /var/web/list-algos
 
 For the database, import the initial dump present in the sql/ folder
 

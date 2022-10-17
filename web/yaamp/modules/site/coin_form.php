@@ -46,11 +46,31 @@ echo CUFHtml::activeLabelEx($coin, 'symbol2');
 echo CUFHtml::activeTextField($coin, 'symbol2', array('maxlength'=>200,'style'=>'width: 120px;'));
 echo '<p class="formHint2">Set it if symbol is different</p>';
 echo CUFHtml::closeCtrlHolder();
-
+/*
 echo CUFHtml::openActiveCtrlHolder($coin, 'algo');
 echo CUFHtml::activeLabelEx($coin, 'algo');
 echo CUFHtml::activeTextField($coin, 'algo', array('maxlength'=>64,'style'=>'width: 120px;'));
 echo '<p class="formHint2">Mining algorithm</p>';
+echo CUFHtml::closeCtrlHolder();
+*/
+echo CUFHtml::openActiveCtrlHolder($coin, 'algo');
+echo CUFHtml::activeLabelEx($coin, 'algo');
+$ListAlgos=array();
+foreach (glob('list-algos/*.conf') as $fullNameAlgo) {
+	$fileNameAlgo = explode('/', $fullNameAlgo);
+	$fileNameAlgo = substr(end($fileNameAlgo),0,-5);
+	if (! substr_count($fileNameAlgo,"."))
+	{ 
+		$ListAlgos[$fileNameAlgo] = $fileNameAlgo;
+	}
+}
+echo CUFHtml::dropDownList('db_coins[algo]', $coin->algo, $ListAlgos, array(
+	'style' => 'border: 1px solid #dfdfdf; height: 26px; width:135px',
+	'class' => 'textInput tweetnews-input'
+));
+$coin_algo = ($coin->algo)? '<span style="color: green;">'.$coin->algo.'</span>' : '<span style="color: red;">None</span>';
+echo '<label style="padding-left: 20px;" for="algo">Algo Selected: '.$coin_algo.'</label>';
+echo '<p class="formHint2">Required all lower case</p>';
 echo CUFHtml::closeCtrlHolder();
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'image');
