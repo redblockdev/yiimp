@@ -113,25 +113,27 @@ if(count($minercount))
 			$percent_shared_shares = $percent_shared_shares? Itoa2($percent_shared_shares).'%': '-';
 		}
 
-		echo '<tr class="ssrow">';
-
 		if ($shared_minercount)
 		{
+			echo '<tr class="ssrow">';
 			echo '<td><b>Shared</b></td>';
 			echo '<td align="right" >'.$shared_minercount.'</td>';
 			echo '<td align="right" width="100">'.$percent_shared_shares.'</td>';
 			echo '<td align="right" width="100"><b>'.$user_shared_rate.'</b></td>';
 			echo '<td align="right" width="100">'.$user_shared_ttf.'</td>';
+			echo '</tr>';
 		}
-		else if ($solo_minercount)
+		
+		if ($solo_minercount)
 		{
+			echo '<tr class="ssrow">';
 			echo '<td><b>Solo</b></td>';
 			echo '<td align="right" >'.$solo_minercount.'</td>';
 		 	echo '<td align="right" width="100">-</td>';
 			echo '<td align="right" width="100"><b>'.$user_solo_rate.'</b></td>';
 			echo '<td align="right" width="100">'.$user_solo_ttf.'</td>';
+			echo '</tr>';
 		}
-		echo '</tr>';
 	}
 	echo "</table>"; 
 }
