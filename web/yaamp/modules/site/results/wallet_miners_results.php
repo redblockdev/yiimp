@@ -172,6 +172,9 @@ if(count($workers))
 
 		$subscribe = Booltoa($worker->subscribe);
 
+		$t = time() - 60;
+		$shares_per_minute = getdbocount('db_shares',"algo=:algo and userid=$user->id and workerid=$worker->id and time>=$t",array(':algo'=>$worker->algo));
+
 		echo '<tr class="ssrow">';
 		echo '<td title="'.$worker->version.'"><b>Version:</b> '.$version.' <br> <b>Worker Name:</b> '.$name.' </td>';
 		if ($this->admin) echo "<td>{$worker->ip}</td>";
@@ -180,7 +183,7 @@ if(count($workers))
 		echo '<td align="right">'.$worker->difficulty.'</td>';
 		echo '<td align="right">'.$subscribe.'</td>';
 		echo '<td align="right">'.$user_rate1.'</td>';
-		echo '<td align="center" title="">-</td>';
+		echo '<td align="center" title="">'.$shares_per_minute.'</td>';
 		echo '</tr>';
 	}
 
