@@ -824,6 +824,44 @@ function yaamp_coin_rate($coinid)
 	return $rate;
 }
 
+function yaamp_coin_shared_rate($coinid)
+{
+	$coin = getdbo('db_coins', $coinid);
+	if(!$coin || !$coin->enable) return 0;
+
+	$target = yaamp_hashrate_constant($coin->algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$shared_workers = getdbolist('db_workers', "algo=:algo and password not like '%m=solo%'", array(':algo'=>$coin->algo));
+	foreach ($shared_workers as $shared_worker)
+	{
+		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$shared_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_coin_shared_rate-$coinid",
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND coinid=$coinid");
+
+	return $rate;
+}
+
+function yaamp_coin_solo_rate($coinid)
+{
+	$coin = getdbo('db_coins', $coinid);
+	if(!$coin || !$coin->enable) return 0;
+
+	$target = yaamp_hashrate_constant($coin->algo);
+	$interval = yaamp_hashrate_step();
+	$delay = time()-$interval;
+	$solo_workers = getdbolist('db_workers', "algo=:algo and password like '%m=solo%'", array(':algo'=>$coin->algo));
+	foreach ($solo_workers as $solo_worker)
+	{
+		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$solo_worker->id));
+	}
+	$rate = controller()->memcache->get_database_scalar("yaamp_coin_rate-$coinid",
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo='1' AND time>$delay AND coinid=$coinid");
+
+	return $rate;
+}
+
 function yaamp_rented_rate($algo=null)
 {
 	if(!$algo) $algo = user()->getState('yaamp-algo');
