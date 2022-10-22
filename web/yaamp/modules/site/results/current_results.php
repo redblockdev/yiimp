@@ -15,9 +15,10 @@ echo <<<END
 <tr>
 <th>Coins</th>
 <th data-sorter="numeric" align="center">Auto Exchanged</th>
+<th data-sorter="numeric" align="center">Minimum Payout</th>
 <th data-sorter="numeric" align="center">Port</th>
-<th data-sorter="numeric" align="center">Symbol</th>
-<th data-sorter="numeric" align="center">Miners<br/>Share/Solo</th>
+<th data-sorter="numeric" align="center">Users (Active)</th>
+<th data-sorter="numeric" align="center">Workers<br/>Share/Solo</th>
 <th data-sorter="numeric" align="center">Pool HashRate</th>
 <th data-sorter="numeric" align="center">Network Hashrate</th>
 <th data-sorter="currency" align="center">Fees<br/>Share/Solo</th>
@@ -149,45 +150,43 @@ foreach ($algos as $item)
 
         foreach ($list as $coin)
         {
-            $name = substr($coin->name, 0, 18);
-            $symbol = $coin->getOfficialSymbol();
-            echo "<td align='left' valign='top' style='font-size: .8em;'><img width='10' src='" . $coin->image . "'>  <b>$name</b> </td>";
-            $port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(
-                ':algo' => $algo,
-                ':symbol' => $symbol
-            ));
-            $port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(
-                ':algo' => $algo,
-                ':symbol' => $symbol
-            ));
-
-            $dontsell = $coin->dontsell;
-            if ($dontsell == 1) echo "<td align='center' valign='top' style='font-size: .8em;'><img width=13 src='/images/cancel.png'></td>";
-            else echo "<td align='center' valign='top' style='font-size: .8em;'><img width=13 src='/images/ok.png'></td>";
-
-            if ($port_count == 1) 
+			$name = substr($coin->name, 0, 20);
+			$symbol = $coin->getOfficialSymbol();
+			echo "<td align='left' valign='top' style='font-size: .8em;'><img width='10' src='".$coin->image."'> <b>$name ($symbol)</b> </td>";
+            $port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $symbol));
+			$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $symbol));
+			
+			$dontsell = $coin->dontsell;
+			if ($dontsell == 1)
+				echo "<td align='center' valign='top' style='font-size: .8em;'><img width=13 src='/images/cancel.png'></td>";
+			else
+				echo "<td align='center' valign='top' style='font-size: .8em;'><img width=13 src='/images/ok.png'></td>";
+			
+			$min_payout = max(floatval(YAAMP_PAYMENTS_MINI), floatval($coin->payout_min));
+			echo "<td align='center' style='font-size: .8em;'><b>".$min_payout." $symbol</b></td>";
+			
+			if ($port_count >= 1)
 				echo "<td align='center' style='font-size: .8em;'><b>".$port_db->port."</b></td>";
-			else 
+			else
 				echo "<td align='center' style='font-size: .8em;'><b>$port</b></td>";
-            
-            echo "<td align='center' style='font-size: .8em;'>$symbol</td>";
-            
-            $workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and not password like '%m=solo%'", array(
-                ':algo' => $algo,
-                ':pid' => $port_db->pid
-            ));
-            $solo_workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and password like '%m=solo%'", array(
-                ':algo' => $algo,
-                ':pid' => $port_db->pid
-            ));
-			if ($port_count == 1) 
+        
+			$users_total = getdbocount('db_accounts', "id IN (SELECT DISTINCT userid FROM workers)");
+			$users_coins = getdbocount('db_accounts', "coinid=:coinid and (id IN (SELECT DISTINCT userid FROM workers))", array(':coinid' => $coin->id));
+			if ($port_count >= 1) 
+				echo "<td align='center' style='font-size: .8em;'>$users_coins</td>";
+			else	
+				echo "<td align='center' style='font-size: .8em;'>$users_total</td>";
+
+			$workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and not password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
+			$solo_workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
+			if ($port_count >= 1) 
 				echo "<td align='center' style='font-size: .8em;'>$workers_coins / $solo_workers_coins</td>";
 			else
 				echo "<td align='center' style='font-size: .8em;'>$workers / $solo_workers</td>";
 			
 			$pool_hash = yaamp_coin_rate($coin->id);
-            $pool_hash_sfx = $pool_hash ? Itoa2($pool_hash) . 'h/s' : '';
-            echo "<td align='center' style='font-size: .8em;'>$pool_hash_sfx</td>";
+			$pool_hash_sfx = $pool_hash ? Itoa2($pool_hash) . 'h/s' : '';
+				echo "<td align='center' style='font-size: .8em;'>$pool_hash_sfx</td>";
             
 			$pool_hash_sfx = $pool_hash ? Itoa2($pool_hash) . 'h/s' : '';
             $min_ttf = $coin->network_ttf > 0 ? min($coin->actual_ttf, $coin->network_ttf) : $coin->actual_ttf;
@@ -227,9 +226,10 @@ foreach ($algos as $item)
             echo "</tr>";
         }
     }
-
-    $total_coins += $coins;
-    $total_miners += $workers;
+	
+	$total_coins += $coins;
+	$total_users = $users_total;
+	$total_miners += $workers;
 	$total_solo += $solo_workers;
 	
 }
@@ -240,10 +240,10 @@ if ($defaultalgo == 'all') echo "<tr style='cursor: pointer; background-color: #
 else echo "<tr style='cursor: pointer' class='ssrow' onclick='javascript:select_algo(\"all\")'>";
 echo "<td><b>all</b></td>";
 echo "<td></td>";
-echo "<td></td>";
 echo "<td align=center style='font-size: .8em;'>$total_coins</td>";
-echo "<td align=center style='font-size: .8em;'>$total_miners / $total_solo</td>";
 echo "<td></td>";
+echo "<td align=center style='font-size: .8em;'>$total_users</td>";
+echo "<td align=center style='font-size: .8em;'>$total_miners / $total_solo</td>";
 echo "<td></td>";
 echo '<td class="estimate"></td>';
 echo '<td class="estimate"></td>';
