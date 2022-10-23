@@ -2,20 +2,12 @@
 	#set_time_limit(60);
 	
 	require_once("/var/web/serverconfig.php");
-	require_once("/var/web/keys.php");
+	//require_once("/var/web/keys.php");
     // require_once("/var/web/yaamp/core/core.php");
 
 	
 	
-    echo "==== Start Proccess Trade Exbitron\n";
-	
-	doExbitronTrading();
-	
-
-    echo "==== End Proccess\n";
-
-
-
+ 
 
 function doExbitronTrading()
 {
@@ -104,7 +96,7 @@ function doExbitronTrading()
 					$result_update = $mysqli->query($sql);
 
 					$uri = strtolower($coin->symbol).'btc';
-			        $ticker = exbitron_api_query("markets/$uri/tickers");
+			        $ticker = exbitron_api_query("markets/tickers");
 					$sellamount = min(5000,bitcoinvaluetoa($amount));
 
 					if ($coin->sellonbid)
@@ -178,7 +170,7 @@ function doExbitronTrading()
 
 	
 }
-
+/*
 function exbitron_api_query($method)
 {
 	$uri = "https://www.exbitron.com/api/v2/peatio/public/$method";
@@ -193,7 +185,7 @@ function exbitron_api_query($method)
 
 	return $obj;
 }
-
+*/
 function exbitron_api_get($method, $req = array())
 {
     // echo __METHOD__;
@@ -306,11 +298,6 @@ function count_delay($time=1)
 		//echo "Delay Time = " .$i. "\n";
 		sleep(1);
 	}
-}
-
-function bitcoinvaluetoa($v)
-{
-	return sprintf('%.8f', round($v, 8, PHP_ROUND_HALF_DOWN));
 }
 
 
