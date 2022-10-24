@@ -51,6 +51,15 @@ span.block.new       { color: white; background-color: #ad4ef0; }
 span.block.orphan    { color: white; background-color: #d9534f; }
 span.block.immature  { color: white; background-color: #f0ad4e; }
 span.block.confirmed { color: white; background-color: #5cb85c; }
+span.shared {
+    padding: 2px;
+    display: inline-block;
+    text-align: center;
+    min-width: 15px;
+    border-radius: 3px;
+    color: #a7adba;
+    background-color: #0B5A71;
+}
 span.solo	{ padding: 2px; display: inline-block; text-align: center; min-width: 15px; border-radius: 3px; color: white; background-color: #48D8D8; }
 
 b.row a { font-size: 10pt; }
@@ -117,8 +126,11 @@ foreach($db_blocks as $db_block)
 	
 	echo '<td class="row right">';
 	if($db_block->solo == '1') 
-		echo '<span class="solo" title="Block was found by solo miner">solo</span>';
-	else echo '<span></span>';
+		echo '<span class="solo" title="Block was found by solo miner">Solo</span>';
+	else if($db_block->solo == '0')
+		echo '<span class="shared" title="Block found was Shared">Shared</span>';
+	else 
+		echo '<span></span>';
 	echo "</td>";
 	
 	echo '<td class="row right">';
