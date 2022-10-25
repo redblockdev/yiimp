@@ -88,11 +88,12 @@ foreach ($list as $coin) {
     $price      = bitcoinvaluetoa($coin->price);
     $height     = number_format($coin->block_height, 0, '.', ' ');
 
-     $total_pool_rate   = yaamp_pool_rate($coin->algo);
-     $pool_total_rate = $total_pool_rate ? 'at ' . Itoa2($total_pool_rate) . 'h/s' : '';
+	$total_pool_rate   = yaamp_pool_rate($coin->algo);
+	$pool_total_rate = $total_pool_rate ? Itoa2($total_pool_rate) . 'h/s' : '';
 
     $pool_ttf   = $total_pool_rate ? $coin->difficulty * 0x100000000 / $total_pool_rate : 0;
     $reward     = round($coin->reward, 3);
+
     $btcmhd    = yaamp_profitability($coin);
     $pool_hash = yaamp_coin_rate($coin->id);
     $real_ttf  = $pool_hash ? $coin->difficulty * 0x100000000 / $pool_hash : 0;
@@ -215,26 +216,30 @@ foreach ($list as $coin) {
     if (!YAAMP_ALLOW_EXCHANGE && !empty($real_ttf) && !empty($shared_real_ttf) && !empty($solo_real_ttf))
         echo '<td align="right" style="font-size: .8em ;" title="Shared: '.$shared_real_ttf.' at '.$pool_shared_hash_sfx.'
 Solo: '.$solo_real_ttf.' at '.$pool_solo_hash_sfx.'
-Full pool speed: '.$pool_ttf.' '.$pool_total_rate.'">'.$real_ttf.'</td>';
+Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
     elseif (!empty($real_ttf) && !empty($shared_real_ttf) && !empty($solo_real_ttf))
         echo '<td align="right" style="font-size: .8em ;" title="Shared: '.$shared_real_ttf.' at '.$pool_shared_hash_sfx.'
 Solo: '.$solo_real_ttf.' at '.$pool_solo_hash_sfx.'
-Full pool speed: '.$pool_ttf.' '.$pool_total_rate.'">'.$real_ttf.'</td>';
+Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
+    elseif (!empty($real_ttf) && !empty($shared_real_ttf) && !empty($solo_real_ttf))
+        echo '<td align="right" style="font-size: .8em ;" title="Shared: '.$shared_real_ttf.' at '.$pool_shared_hash_sfx.'
+Solo: '.$solo_real_ttf.' at '.$pool_solo_hash_sfx.'
+Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
     elseif (!empty($real_ttf) && !empty($shared_real_ttf))
         echo '<td align="right" style="font-size: .8em ;" title="Shared: '.$shared_real_ttf.' at '.$pool_shared_hash_sfx.'
-Full pool speed: '.$pool_ttf.' '.$pool_total_rate.'">'.$real_ttf.'</td>';
+Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
     elseif (!empty($real_ttf) && !empty($solo_real_ttf))
         echo '<td align="right" style="font-size: .8em ;" title="Solo: '.$solo_real_ttf.' at '.$pool_solo_hash_sfx.'
-Full pool speed: '.$pool_ttf.' '.$pool_total_rate.'">'.$real_ttf.'</td>';
+Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
     elseif (!empty($real_ttf))
-        echo '<td align="right" style="font-size: .8em ;" title="Full pool speed: '.$pool_ttf.' '.$pool_total_rate.'">'.$real_ttf.'</td>';
+        echo '<td align="right" style="font-size: .8em ;" title="Full pool speed: '.$pool_ttf.' at '.$pool_total_rate.'">'.$real_ttf.'</td>';
     else
         echo '<td align="right" style="font-size: .8em;" title="At current pool speed">' . $pool_ttf . '</td>';
 
     if ($coin->auxpow && $coin->auto_ready)
         echo "<td align=right style='font-size: .8em; opacity: 0.6;' title='merge mined\n$network_hash' data='$pool_hash_pow'>$pool_hash_pow_sfx</td>";
     else
-        echo "<td align=right style='font-size: .8em;' title='$network_hash' data='$pool_hash'>$pool_hash_sfx</td>";
+        echo "<td align=right style='font-size: .8em;' title='Network: $network_hash' data='$pool_hash'>$pool_hash_sfx</td>";
 
     $btcmhd = mbitcoinvaluetoa($btcmhd);
     echo "<td align=right style='font-size: .8em;' data='$btcmhd'><b>$btcmhd</b></td>";

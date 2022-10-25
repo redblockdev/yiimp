@@ -160,6 +160,9 @@ function yaamp_algo_mBTC_factor($algo)
 		return 0.001;
 	case 'vanilla':
 		return 1000;
+	case 'heavyhash':
+	case 'sha512256d':
+		return 1000;
 	default:
 		return 1;
 	}
@@ -509,22 +512,6 @@ function yaamp_fee($algo)
 	$fee = controller()->memcache->get("yaamp_fee-$algo");
 	if($fee && is_numeric($fee)) return (float) $fee;
 
-/*	$norm = yaamp_get_algo_norm($algo);
-	if($norm == 0) $norm = 1;
-
-	$hashrate = getdbosql('db_hashrate', "algo=:algo order by time desc", array(':algo'=>$algo));
-	if(!$hashrate || !$hashrate->difficulty) return 1;
-
-	$target = yaamp_hashrate_constant($algo);
-	$interval = yaamp_hashrate_step();
-	$delay = time()-$interval;
-
-	$rate = controller()->memcache->get_database_scalar("yaamp_pool_rate_coinonly-$algo",
-		"select sum(difficulty) * $target / $interval / 1000 from shares where valid and time>$delay and algo=:algo and jobid=0", array(':algo'=>$algo));
-
-//	$fee = round(log($hashrate->hashrate * $norm / 1000000 / $hashrate->difficulty + 1), 1) + YAAMP_FEES_MINING;
-//	$fee = round(log($rate * $norm / 2000000 / $hashrate->difficulty + 1), 1) + YAAMP_FEES_MINING;
-*/
 	$fee = YAAMP_FEES_MINING;
 
 	// local fees config
@@ -837,8 +824,9 @@ function yaamp_coin_shared_rate($coinid)
 	{
 		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$shared_worker->id));
 	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_coin_shared_rate-$coinid",
-		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND coinid=$coinid");
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo=0 AND time>$delay AND coinid=$coinid");
 
 	return $rate;
 }
@@ -856,8 +844,8 @@ function yaamp_coin_solo_rate($coinid)
 	{
 		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$solo_worker->id));
 	}
-	$rate = controller()->memcache->get_database_scalar("yaamp_coin_rate-$coinid",
-		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo='1' AND time>$delay AND coinid=$coinid");
+	$rate = controller()->memcache->get_database_scalar("yaamp_coin_solo_rate-$coinid",
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo=1 AND time>$delay AND coinid=$coinid");
 
 	return $rate;
 }
