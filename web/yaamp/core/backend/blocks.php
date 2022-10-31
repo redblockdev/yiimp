@@ -81,6 +81,36 @@ function BackendBlockNew($coin, $db_block)
 			$user->last_earning = time();
 			$user->save();
 
+			$last = dborow("SELECT height, time FROM blocks " . "WHERE coin_id=:id AND category IN ('immature','generate') ORDER BY height DESC LIMIT 1", array(':id' => $coin->id));
+			$timesincelast = $timelast = (int) arraySafeVal($last, 'time');
+			if ($timelast > 0)
+				$timesincelast = time() - $timelast;
+
+			$min_ttf      = $coin->network_ttf > 0 ? min($coin->actual_ttf, $coin->network_ttf) : $coin->actual_ttf;
+			if (!$network_hash)
+			{
+				$remote = new WalletRPC($coin);
+				if ($remote) $info = $remote->getmininginfo();
+				if (isset($info['networkhashps']))
+				{
+            		$network_hash = $info['networkhashps'];
+            		controller()->memcache->set("yiimp-nethashrate-{$coin->symbol}", $info['networkhashps'], $timesincelast);
+				}
+				else if (isset($info['netmhashps']))
+				{
+            		$network_hash = floatval($info['netmhashps']) * 1e6;
+            		controller()->memcache->set("yiimp-nethashrate-{$coin->symbol}", $network_hash, $timesincelast);
+				}
+				else
+				{
+					$network_hash = $coin->difficulty * 0x100000000 / ($min_ttf? $min_ttf: $timesincelast);
+				}
+			}
+
+			$pool_shared_hash = yaamp_coin_shared_rate($coin->id);
+   			$effort = round($pool_shared_hash * 100 / $network_hash , 2);
+			$db_block->effort = $effort;
+			
 			$db_block->solo = 0;
 			$db_block->save();
 		}
@@ -124,6 +154,37 @@ function BackendBlockNew($coin, $db_block)
 	
 		$user->last_earning = time();
 		$user->save();
+		
+		$last = dborow("SELECT height, time FROM blocks " . "WHERE coin_id=:id AND category IN ('immature','generate') ORDER BY height DESC LIMIT 1", array(':id' => $coin->id));
+		$timesincelast = $timelast = (int) arraySafeVal($last, 'time');
+		if ($timelast > 0)
+			$timesincelast = time() - $timelast;
+
+		$min_ttf      = $coin->network_ttf > 0 ? min($coin->actual_ttf, $coin->network_ttf) : $coin->actual_ttf;
+		$network_hash = controller()->memcache->get("yiimp-nethashrate-{$coin->symbol}");
+		if (!$network_hash)
+    	{
+        	$remote = new WalletRPC($coin);
+        	if ($remote) $info = $remote->getmininginfo();
+        	if (isset($info['networkhashps']))
+        	{
+            		$network_hash = $info['networkhashps'];
+            		controller()->memcache->set("yiimp-nethashrate-{$coin->symbol}", $info['networkhashps'], $timesincelast);
+        	}
+        	else if (isset($info['netmhashps']))
+        	{
+            		$network_hash = floatval($info['netmhashps']) * 1e6;
+            		controller()->memcache->set("yiimp-nethashrate-{$coin->symbol}", $network_hash, $timesincelast);
+        	}
+			else
+			{
+				$network_hash = $coin->difficulty * 0x100000000 / ($min_ttf? $min_ttf: $timesincelast);
+			}
+		}
+
+		$pool_solo_hash = yaamp_coin_solo_rate($coin->id);
+		$effort = round($pool_solo_hash * 100 / $network_hash, 2);
+		$db_block->effort = $effort;
 		
 		$db_block->solo = 1;
 		$db_block->save();
