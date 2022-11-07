@@ -193,6 +193,10 @@ endif;
 <br><br><br><br><br><br><br><br><br><br>
 </div>
 
+<div id='pool_coins_info'>
+<br><br><br><br><br><br><br><br><br><br>
+</div>
+
 </td></tr></table>
 
 <br><br><br><br><br><br><br><br><br><br>
@@ -206,6 +210,8 @@ function page_refresh()
 {
     pool_current_refresh();
     pool_history_refresh();
+	pool_coins_info_refresh();
+
 }
 
 function select_algo(algo)
@@ -237,6 +243,19 @@ function pool_history_refresh()
 {
     var url = "/site/history_results";
     $.get(url, '', pool_history_ready);
+}
+
+////////////////////////////////////////////////////
+
+function pool_coins_info_ready(data)
+{
+    $('#pool_coins_info').html(data);
+}
+
+function pool_coins_info_refresh()
+{
+    var url = "/site/coins_info";
+    $.get(url, '', pool_coins_info_ready);
 }
 
 </script>
