@@ -468,6 +468,24 @@ echo CUFHtml::activeTextField($coin, 'link_explorer');
 echo "<p class='formHint2'></p>";
 echo CUFHtml::closeCtrlHolder();
 
+echo CUFHtml::openActiveCtrlHolder($coin, 'link_twitter');
+echo CUFHtml::activeLabelEx($coin, 'link_twitter');
+echo CUFHtml::activeTextField($coin, 'link_twitter');
+echo "<p class='formHint2'></p>";
+echo CUFHtml::closeCtrlHolder();
+
+echo CUFHtml::openActiveCtrlHolder($coin, 'link_discord');
+echo CUFHtml::activeLabelEx($coin, 'link_discord');
+echo CUFHtml::activeTextField($coin, 'link_discord');
+echo "<p class='formHint2'></p>";
+echo CUFHtml::closeCtrlHolder();
+
+echo CUFHtml::openActiveCtrlHolder($coin, 'link_facebook');
+echo CUFHtml::activeLabelEx($coin, 'link_facebook');
+echo CUFHtml::activeTextField($coin, 'link_facebook');
+echo "<p class='formHint2'></p>";
+echo CUFHtml::closeCtrlHolder();
+
 echo "</div>";
 
 
