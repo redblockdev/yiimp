@@ -6,6 +6,7 @@ function yaamp_get_algos()
 	return array(
 		'sha256',
 		'sha256csm',
+		'sha256dt',
 		'sha256t',
 		'sha3d',
 		'sha512256d',
@@ -222,6 +223,7 @@ function getAlgoColors($algo)
 	$a = array(
 		'sha256'	=> '#d0d0a0',
 		'sha256csm'	=> '#d0d0a0',
+		'sha256dt'	=> '#d0d0f0',
 		'sha256t'	=> '#d0d0f0',
 		'sha3d'		=> '#d0d0f0',
 		'sha512256d'	=> '#d0d0a0',
@@ -364,6 +366,7 @@ function getAlgoPort($algo)
 	$a = array(
 		'sha256'	=> 3333,
 		'sha256csm'	=> 3340,
+		'sha256dt'	=> 3338,
 		'sha256t'	=> 3339,
 		'sha3d'		=> 3335,
 		'sha512256d'	=> 7086,
