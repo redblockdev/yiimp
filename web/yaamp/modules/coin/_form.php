@@ -24,8 +24,18 @@ if(!$coin->installed)
 
 	echo CUFHtml::openActiveCtrlHolder($coin, 'algo');
 	echo CUFHtml::activeLabelEx($coin, 'algo');
-	echo CUFHtml::activeTextField($coin, 'algo');
-	echo "<p class='formHint2'></p>";
+	$ListAlgos = array();
+	$db_algos = getdbolist('db_algos');
+	foreach ($db_algos as $algo) 
+	{
+		$NameAlgo = $algo->name;
+		$ListAlgos[$NameAlgo] = $NameAlgo;
+	}
+	echo CUFHtml::dropDownList('db_coins[algo]', $coin->algo, $ListAlgos, array(
+		'style' => 'border: none; height: 26px; width:38%',
+		'class' => 'textInput tweetnews-input'
+	));
+	echo '<p class="formHint2">Required all lower case</p>';
 	echo CUFHtml::closeCtrlHolder();
 
 	echo CUFHtml::openActiveCtrlHolder($coin, 'image');
