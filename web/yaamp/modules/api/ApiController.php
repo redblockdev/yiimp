@@ -207,13 +207,18 @@ class ApiController extends CommonController
 				$fees_solo = yaamp_fee_solo($coin->algo);
 				$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $coin->algo,':symbol' => $coin->symbol));
 
+				if ($port_db) 
+					$port = $port_db->port;
+				else 
+					$port = getAlgoPort($coin->algo);
+
 				$min_payout = max(floatval(YAAMP_PAYMENTS_MINI), floatval($coin->payout_min));
 		
 				$data[$symbol] = array
 				(
 					'name' => $coin->name,
 					'algo' => $coin->algo,
-					'port' => $port_db->port,
+					'port' => $port,
 					'reward' => $coin->reward,
 					'blocktime' => $coin->block_time,
 					'height' => (int) $coin->block_height,
