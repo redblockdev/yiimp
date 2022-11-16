@@ -91,13 +91,13 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600) . " hours";
                 $id = $coin->id;
                 $algo = $coin->algo;
 
-        	$port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $symbol));
+        	$port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $coin->symbol));
 
-        	$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $symbol));
+        	$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $coin->symbol));
 
        		if ($port_count >= 1){$port = $port_db->port;}else{$port = '0000';}
        		if($count == 0){ echo "<option disabled=''>$algo";}elseif($algo != $algoheading){echo "<option disabled=''>$algo</option>";}
-        	echo "<option data-port='$port' data-algo='-a $algo' data-symbol='$symbol'>$name ($symbol)</option>";
+        	echo "<option data-port='$port' data-algo='-a $algo' data-symbol='$coin->symbol'>$name ($symbol)</option>";
 
        		$count=$count+1;
         	$algoheading=$algo;
