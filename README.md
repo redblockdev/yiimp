@@ -144,9 +144,11 @@ Thanks to globalzon to have released the initial Yaamp source code.
 You can support this project donating 
 
 tpruvot :
+
 	BTC : 1Auhps1mHZQpoX4mCcVL8odU81VakZQ6dR
 
 xiaolin1579 :
+
 	BTC : 1Hfa7BBHejzGj4CNRpV2Lh4xYGizX8c1A5
 	
 	BTC [BEP20] : 0xf6e4e1ce8b3801a612cfff40f29116fbf595b13e
