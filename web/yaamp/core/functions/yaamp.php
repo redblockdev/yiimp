@@ -639,11 +639,7 @@ function yaamp_pool_shared_rate($algo=null)
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$shared_workers = getdbolist('db_workers', "algo=:algo and password not like '%m=solo%'", array(':algo'=>$algo));
-	foreach ($shared_workers as $shared_worker)
-	{
-		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$shared_worker->id));
-	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_pool_shared_rate-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND algo=:algo AND solo=0", array(':algo'=>$algo));
 	return $rate;
 }
@@ -655,11 +651,7 @@ function yaamp_pool_solo_rate($algo=null)
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$solo_workers = getdbolist('db_workers', "algo=:algo and password like '%m=solo%'", array(':algo'=>$algo));
-	foreach ($solo_workers as $solo_worker)
-	{
-		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$solo_worker->id));
-	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_pool_solo_rate-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND algo=:algo AND solo=1", array(':algo'=>$algo));
 	return $rate;
 }
@@ -713,11 +705,7 @@ function yaamp_user_shared_rate($userid, $algo=null)
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$shared_workers = getdbolist('db_workers', "userid=$userid AND algo=:algo and password not like '%m=solo%'", array(':algo'=>$algo));
-	foreach ($shared_workers as $shared_worker)
-	{
-		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$shared_worker->id));
-	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_user_shared_rate-$userid-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo AND solo=0", array(':algo'=>$algo));
 	return $rate;
 }
@@ -729,11 +717,7 @@ function yaamp_user_solo_rate($userid, $algo=null)
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$solo_workers = getdbolist('db_workers', "userid=$userid AND algo=:algo and password like '%m=solo%'", array(':algo'=>$algo));
-	foreach ($solo_workers as $solo_worker)
-	{
-		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$algo,':workerid'=>$solo_worker->id));
-	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_user_solo_rate-$userid-$algo","SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo AND solo=1", array(':algo'=>$algo));
 	return $rate;
 }
@@ -822,11 +806,6 @@ function yaamp_coin_shared_rate($coinid)
 	$target = yaamp_hashrate_constant($coin->algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$shared_workers = getdbolist('db_workers', "algo=:algo and password not like '%m=solo%'", array(':algo'=>$coin->algo));
-	foreach ($shared_workers as $shared_worker)
-	{
-		dborun("UPDATE shares SET solo='0' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$shared_worker->id));
-	}
 
 	$rate = controller()->memcache->get_database_scalar("yaamp_coin_shared_rate-$coinid",
 		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo=0 AND time>$delay AND coinid=$coinid");
@@ -842,11 +821,7 @@ function yaamp_coin_solo_rate($coinid)
 	$target = yaamp_hashrate_constant($coin->algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	$solo_workers = getdbolist('db_workers', "algo=:algo and password like '%m=solo%'", array(':algo'=>$coin->algo));
-	foreach ($solo_workers as $solo_worker)
-	{
-		dborun("UPDATE shares SET solo='1' WHERE algo=:algo AND workerid=:workerid",array(':algo'=>$coin->algo,':workerid'=>$solo_worker->id));
-	}
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_coin_solo_rate-$coinid",
 		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND solo=1 AND time>$delay AND coinid=$coinid");
 
