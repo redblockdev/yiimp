@@ -176,13 +176,14 @@ foreach ($algos as $item)
 			else	
 				echo "<td align='center' style='font-size: .8em;'>$users_total</td>";
             
-			$workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and not password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
-            $solo_workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
-            if ($port_count == 1) 
-	    		echo "<td align='center' style='font-size: .8em;'>$workers_coins / $solo_workers_coins </td>";
+            if ($port_count == 1) {
+                $workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and not password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
+                $solo_workers_coins = getdbocount('db_workers', "algo=:algo and pid=:pid and password like '%m=solo%'", array(':algo' => $algo,':pid' => $port_db->pid));
+                echo "<td align='center' style='font-size: .8em;'>$workers_coins / $solo_workers_coins </td>";
+            }
 			else
 				echo "<td align='center' style='font-size: .8em;'>$workers / $solo_workers </td>";
-			
+
             $pool_hash = yaamp_coin_rate($coin->id);
             $pool_hash_sfx = $pool_hash ? Itoa2($pool_hash) . 'h/s' : '0 h/s';
 			$pool_shared_hash = yaamp_coin_shared_rate($coin->id);
