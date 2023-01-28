@@ -175,7 +175,7 @@ char *rpc_do_call(YAAMP_RPC *rpc, char const *data)
 
 	int status = atoi(p+1);
 	if(status != 200)
-		debuglog("ERROR: rpc_do_call: %s:%d %d\n", rpc->host, rpc->port, status);
+		debuglog("ERROR: rpc_do_call: %s:%d %d - data: %s\n", rpc->host, rpc->port, status,data);
 
 	char tmp[1024];
 
