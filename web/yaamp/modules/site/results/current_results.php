@@ -61,6 +61,7 @@ function cmp($a, $b)
 
 usort($algos, 'cmp');
 $total_coins = 0;
+$total_users = 0;
 $total_workers = 0;
 $total_solo_workers = 0;
 $showestimates = false;
@@ -154,7 +155,7 @@ foreach ($algos as $item)
             $name = substr($coin->name, 0, 20);
             $symbol = $coin->getOfficialSymbol();
             echo "<td align='left' valign='top' style='font-size: .8em;'><img width='10' src='" . $coin->image . "'>  <b>$name ($coin->symbol)</b> </td>";
-            $port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $coin->symbol));
+            $port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $coin->symbol));  //always zero because symbol in db_stratums is null;
             $port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(':algo' => $algo,':symbol' => $coin->symbol));
 
             $dontsell = $coin->dontsell;
@@ -163,6 +164,11 @@ foreach ($algos as $item)
 			
 			$min_payout = max(floatval(YAAMP_PAYMENTS_MINI), floatval($coin->payout_min));
 			echo "<td align='center' style='font-size: .8em;'><b>".$min_payout." $symbol</b></td>";
+
+            //Test if mine_port settle. else use defalut port;
+}           if($coin->mine_port!=null) $port=$coin->mine_port;
+            else $port = getAlgoPort($algo);
+
 
 			if ($port_count >= 1) 
 				echo "<td align='center' style='font-size: .8em;'><b>".$port_db->port."</b></td>";
@@ -231,7 +237,8 @@ foreach ($algos as $item)
     }
 
 	$total_coins += $coins;
-	$total_users = $users_total;
+    if($users_total==null)  $total_users=0;
+    else $total_users=$users_total;
 	$total_workers += $workers;
 	$total_solo_workers += $solo_workers;
 }
