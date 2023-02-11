@@ -136,6 +136,11 @@ char *rpc_do_call(YAAMP_RPC *rpc, char const *data)
 	}
 
 	res = rpc_send_raw(rpc, data, strlen(data));
+	if (strstr(data, "submitblock"))
+		debuglog("%s => Sending Raw Byte Count = %d\n", rpc->coind->symbol, res);
+	else if (strstr(data, "getaddressinfo"))
+		debuglog("%s => Debuging getaddressinfo\n", rpc->coind->symbol);
+
 	if(res <= 0)
 	{
 		CommonUnlock(&rpc->mutex);

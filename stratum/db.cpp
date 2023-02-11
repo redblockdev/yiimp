@@ -126,6 +126,7 @@ void db_update_algos(YAAMP_DB *db)
 		db_query(db, "UPDATE algos SET overflow=true WHERE name='%s'", g_stratum_algo);
 	}
 
+	//It's too wire for me. Seem the author use this to verify if a stratum is mining on multi-coins;
 	char symbol[16] = "NULL\0";
 	if(g_list_coind.count == 1) {
 		if (g_list_coind.first) {

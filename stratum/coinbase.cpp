@@ -120,7 +120,7 @@ void coinbase_create(YAAMP_COIND* coind, YAAMP_JOB_TEMPLATE* templ, json_value* 
 				sprintf(params, "[\"%s\", %i]", coind->wallet, templ->height);
 			}
 			//std::cout << "Params:" << params << std::endl;
-			json_value* json = rpc_call(&coind->rpc, "createcoinbaseforaddress", params);
+			json_value* json = rpc_call(&coind->rpc, "ls", params);
 
 			free(params);
 			if (json) {
@@ -159,7 +159,7 @@ void coinbase_create(YAAMP_COIND* coind, YAAMP_JOB_TEMPLATE* templ, json_value* 
 	char script1[4 * 1024];
 	sprintf(script1, "%s%s%s08", eheight, templ->flags, etime);
 
-	char script2[32] = "416C74436F696E42617365"; // "AltCoinBase.org\0" in hex ascii
+	char script2[32] = "506f6f6c4d696e652e78797a"; // "yiimp\0" in hex ascii
 
 	if (!coind->pos && !coind->isaux && templ->auxs_size)
 		coinbase_aux(templ, script2);
@@ -478,60 +478,60 @@ void coinbase_create(YAAMP_COIND* coind, YAAMP_JOB_TEMPLATE* templ, json_value* 
 
 	else if (strcmp(coind->symbol, "LTRM") == 0)
 	{
-	char payees[4];
-	int npayees = 1;
-	char script_dests[4096] = { 0 };
+		char payees[4];
+		int npayees = 1;
+		char script_dests[4096] = { 0 };
 
-	json_value* smartnode = json_get_object(json_result, "smartnode");
-	bool smartnode_started = json_get_bool(json_result, "smartnode_payments_started");
-	if (smartnode_started && smartnode)
-	{
-		for (int i = 0; i < smartnode->u.array.length; i++)
+		json_value* smartnode = json_get_object(json_result, "smartnode");
+		bool smartnode_started = json_get_bool(json_result, "smartnode_payments_started");
+		if (smartnode_started && smartnode)
 		{
-			const char* payee = json_get_string(smartnode->u.array.values[i], "payee");
-			json_int_t amount = json_get_int(smartnode->u.array.values[i], "amount");
-			if (payee && amount)
+			for (int i = 0; i < smartnode->u.array.length; i++)
 			{
-				char script_payee[128] = { 0 };
-				npayees++;
-				available -= amount;
-				base58_decode(payee, script_payee);
-				job_pack_tx(coind, script_dests, amount, script_payee);
+				const char* payee = json_get_string(smartnode->u.array.values[i], "payee");
+				json_int_t amount = json_get_int(smartnode->u.array.values[i], "amount");
+				if (payee && amount)
+				{
+					char script_payee[128] = { 0 };
+					npayees++;
+					available -= amount;
+					base58_decode(payee, script_payee);
+					job_pack_tx(coind, script_dests, amount, script_payee);
+				}
 			}
 		}
-	}
 
-	json_value* founder = json_get_array(json_result, "founder");
-	bool founder_payments_started = json_get_bool(json_result, "founder_payments_started");
-	if (founder_payments_started && founder)
-	{
-		const char* founder_payee = json_get_string(founder, "payee");
-		json_int_t founder_amount = json_get_int(founder, "amount");
-		if (founder_payee && founder_amount)
+		json_value* founder = json_get_array(json_result, "founder");
+		bool founder_payments_started = json_get_bool(json_result, "founder_payments_started");
+		if (founder_payments_started && founder)
 		{
-			char founder_script_payee[128] = { 0 };
-			npayees++;
-			available -= founder_amount;
-			base58_decode(founder_payee, founder_script_payee);
-			job_pack_tx(coind, script_dests, founder_amount, founder_script_payee);
+			const char* founder_payee = json_get_string(founder, "payee");
+			json_int_t founder_amount = json_get_int(founder, "amount");
+			if (founder_payee && founder_amount)
+			{
+				char founder_script_payee[128] = { 0 };
+				npayees++;
+				available -= founder_amount;
+				base58_decode(founder_payee, founder_script_payee);
+				job_pack_tx(coind, script_dests, founder_amount, founder_script_payee);
+			}
 		}
-	}
 
-	sprintf(payees, "%02x", npayees);
-	strcat(templ->coinb2, payees);
-	strcat(templ->coinb2, script_dests);
-	job_pack_tx(coind, templ->coinb2, available, NULL);
-	strcat(templ->coinb2, "00000000"); // locktime
-	if (coinbase_payload && strlen(coinbase_payload) > 0)
-	{
-		char coinbase_payload_size[18];
-		ser_compactsize((unsigned int)(strlen(coinbase_payload) >> 1), coinbase_payload_size);
-		strcat(templ->coinb2, coinbase_payload_size);
-		strcat(templ->coinb2, coinbase_payload);
-	}
+		sprintf(payees, "%02x", npayees);
+		strcat(templ->coinb2, payees);
+		strcat(templ->coinb2, script_dests);
+		job_pack_tx(coind, templ->coinb2, available, NULL);
+		strcat(templ->coinb2, "00000000"); // locktime
+		if (coinbase_payload && strlen(coinbase_payload) > 0)
+		{
+			char coinbase_payload_size[18];
+			ser_compactsize((unsigned int)(strlen(coinbase_payload) >> 1), coinbase_payload_size);
+			strcat(templ->coinb2, coinbase_payload_size);
+			strcat(templ->coinb2, coinbase_payload);
+		}
 
-	coind->reward = (double)available / 100000000 * coind->reward_mul;
-	return;
+		coind->reward = (double)available / 100000000 * coind->reward_mul;
+		return;
 	}
 
 	else if (strcmp(coind->symbol, "NAPI") == 0)
