@@ -573,13 +573,13 @@ bool client_submit(YAAMP_CLIENT* client, json_value* json_params)
 		if (map_it->second < share_diff) {
 			hash_map[map_it->first] = share_diff;
 			debuglog("%s => submit %s (uid %d) with session max DIFF = %.3f / %.3f\n", job->coind->symbol,client->sock->ip, client->userid,
-				share_diff / coin_diff);
+				share_diff , coin_diff);
 		}
 	}
 	else {
 		hash_map[job->coind->symbol] = share_diff;
 		debuglog("%s => submit %s (uid %d) with session max DIFF = %.3f / %.3f\n", job->coind->symbol, client->sock->ip, client->userid,
-			share_diff / coin_diff);
+			share_diff , coin_diff);
 	}
 
 	//if (fmod(share_diff, 9) < 1)
