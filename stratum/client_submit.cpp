@@ -1,7 +1,11 @@
 
 #include "stratum.h"
+#include <map>
 
 uint64_t lyra2z_height = 0;
+
+typedef std::map<string, double> MAX_HASH_MAP;
+MAX_HASH_MAP hash_map;
 
 //#define MERKLE_DEBUGLOG
 //#define DONTSUBMIT
@@ -561,10 +565,26 @@ bool client_submit(YAAMP_CLIENT* client, json_value* json_params)
 
 	//if (g_debuglog_hash) {
 		// only log a few...
-	if (share_diff > (client->difficulty_actual * 16))
-		debuglog("submit %s (uid %d) %d, %s, %s, %s, %.3f/%.3f\n", client->sock->ip, client->userid,
-			jobid, extranonce2, ntime, nonce, share_diff, client->difficulty_actual);
-	//}
+
+	std::map<string, double>::iterator map_it;
+	map_it = hash_map.find(job->coind->symbol);
+	if (map_it != hash_map.end()) {
+		if (map_it->second < share_diff) {
+			hash_map[map_it->first] = share_diff;
+			debuglog("%s => submit %s (uid %d) with session max HR = %.3f\n", job->coind->symbol,client->sock->ip, client->userid,
+				share_diff);
+		}
+	}
+	else {
+		hash_map[job->coind->symbol] = share_diff;
+		debuglog("%s => submit %s (uid %d) with session max HR = %.3f\n", job->coind->symbol, client->sock->ip, client->userid,
+			share_diff);
+	}
+
+	//if (fmod(share_diff, 9) < 1)
+	//	debuglog("submit %s (uid %d) %d, %s, %s, %s, %.3f/%.3f\n", client->sock->ip, client->userid,
+	//		jobid, extranonce2, ntime, nonce, share_diff, client->difficulty_actual);
+	////}
 
 	share_add(client, job, true, extranonce2, ntime, nonce, share_diff, 0);
 	object_unlock(job);
