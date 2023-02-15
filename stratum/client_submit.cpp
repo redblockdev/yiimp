@@ -559,6 +559,7 @@ bool client_submit(YAAMP_CLIENT* client, json_value* json_params)
 	}
 
 	double share_diff = diff_to_target(hash_int);
+	double coin_diff = diff_to_target(coin_target);
 	//	if (g_current_algo->diff_multiplier != 0) {
 	//		share_diff = share_diff / g_current_algo->diff_multiplier;
 	//	}
@@ -571,14 +572,14 @@ bool client_submit(YAAMP_CLIENT* client, json_value* json_params)
 	if (map_it != hash_map.end()) {
 		if (map_it->second < share_diff) {
 			hash_map[map_it->first] = share_diff;
-			debuglog("%s => submit %s (uid %d) with session max HR = %.3f\n", job->coind->symbol,client->sock->ip, client->userid,
-				share_diff);
+			debuglog("%s => submit %s (uid %d) with session max DIFF = %.3f / %.3f\n", job->coind->symbol,client->sock->ip, client->userid,
+				share_diff / coin_diff);
 		}
 	}
 	else {
 		hash_map[job->coind->symbol] = share_diff;
-		debuglog("%s => submit %s (uid %d) with session max HR = %.3f\n", job->coind->symbol, client->sock->ip, client->userid,
-			share_diff);
+		debuglog("%s => submit %s (uid %d) with session max DIFF = %.3f / %.3f\n", job->coind->symbol, client->sock->ip, client->userid,
+			share_diff / coin_diff);
 	}
 
 	//if (fmod(share_diff, 9) < 1)
