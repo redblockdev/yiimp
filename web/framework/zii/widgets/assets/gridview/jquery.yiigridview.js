@@ -2,9 +2,9 @@
  * jQuery Yii GridView plugin file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link https://www.yiiframework.com/
+ * @link http://www.yiiframework.com/
  * @copyright 2008-2010 Yii Software LLC
- * @license https://www.yiiframework.com/license/
+ * @license http://www.yiiframework.com/license/
  */
 
 (function ($) {
@@ -171,9 +171,9 @@
 
 						if (settings.selectableRows === 1) {
 							$row.siblings().removeClass('selected');
-							$checks.prop('checked', false).trigger("change");
+							$checks.prop('checked', false);
 						}
-						$('input.select-on-check', $row).prop('checked', isRowSelected).trigger("change");
+						$('input.select-on-check', $row).prop('checked', isRowSelected);
 						$("input.select-on-check-all", $currentGrid).prop('checked', $checks.length === $checks.filter(':checked').length);
 
 						if (settings.selectionChanged !== undefined) {
@@ -188,11 +188,11 @@
 								$rows = $currentGrid.find('.' + settings.tableClass).children('tbody').children();
 							if (this.checked) {
 								$rows.addClass('selected');
-								$checks.prop('checked', true).trigger("change");
+								$checks.prop('checked', true);
 								$checksAll.prop('checked', true);
 							} else {
 								$rows.removeClass('selected');
-								$checks.prop('checked', false).trigger("change");
+								$checks.prop('checked', false);
 								$checksAll.prop('checked', false);
 							}
 							if (settings.selectionChanged !== undefined) {

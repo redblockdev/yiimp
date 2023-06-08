@@ -3,9 +3,9 @@
  * CJavaScriptExpression class file.
  *
  * @author Alexander Makarov <sam@rmcreative.ru>
- * @link https://www.yiiframework.com/
+ * @link http://www.yiiframework.com/
  * @copyright Copyright &copy; 2012 Yii Software LLC
- * @license https://www.yiiframework.com/license/
+ * @license http://www.yiiframework.com/license/
  */
 
 /**

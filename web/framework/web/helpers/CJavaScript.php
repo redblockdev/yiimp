@@ -3,9 +3,9 @@
  * CJavaScript helper class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link https://www.yiiframework.com/
+ * @link http://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license https://www.yiiframework.com/license/
+ * @license http://www.yiiframework.com/license/
  */
 
 /**
@@ -27,14 +27,12 @@ class CJavaScript
 	 */
 	public static function quote($js,$forUrl=false)
 	{
-		$js = (string)$js;
-
-		Yii::import('system.vendors.zend-escaper.Escaper');
-		$escaper=new Escaper(Yii::app()->charset);
-		if($forUrl)
-			return $escaper->escapeUrl($js);
-		else
-			return $escaper->escapeJs($js);
+        Yii::import('system.vendors.zend-escaper.Escaper');
+        $escaper=new Escaper(Yii::app()->charset);
+        if($forUrl)
+            return $escaper->escapeUrl($js);
+        else
+            return $escaper->escapeJs($js);
 	}
 
 	/**
