@@ -194,7 +194,8 @@ YAAMP_ALGO g_algos[] =
 	{"sha3d", sha3d_hash, 1, 0, sha3d_hash_hex},
 	{"sha512256d", sha512_256_double_hash, 1, 0, 0},
 	{"sib", sib_hash, 1, 0, 0},
-	{"skein", skein_hash, 1, 0, 0},
+	{"skydoge", skydoge_hash, 1, 0, 0}, /* Skydoge */
+	{"skein", skein_hash, 1, 0, 0}, 
 	{"skein2", skein2_hash, 1, 0, 0},
 	{"skunk", skunk_hash, 1, 0, 0},
 	{"sonoa", sonoa_hash, 1, 0, 0},

@@ -256,3 +256,4 @@ void sha3d_hash_hex(const char *input, char *output, unsigned int len);
 #include "algos/sha512_256.h"
 #include "algos/sha3d.h"
 #include "algos/sha256dt.h"
+#include "algos/skydoge.h"

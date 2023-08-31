@@ -99,6 +99,7 @@ function yaamp_get_algos()
 		'0x10',
 		'pipe',
 		'sib',
+		'skydoge',
 		'skein',
 		'skein2',
 		'skunk',
@@ -286,6 +287,7 @@ function getAlgoColors($algo)
 		'lbry'		=> '#b0d0e0',
 		'luffa'		=> '#a0c0c0',
 		'm7m'		=> '#d0a0a0',
+		'skydoge'	=> '#d0a0a0',
 		'memehash'	=> '#d0f0a0',
 		'megabtx'	=> '#d0f0a0',
 		'megamec'	=> '#d0f0a0',
@@ -492,6 +494,7 @@ function getAlgoPort($algo)
 		'megabtx'	=> 7066,
 		'megamec'	=> 7067,
 		'mike'		=> 7079,
+		'skydoge'	=> 7091,
 		
 		'astralhash'   	=> 8640,
 		'globalhash'   	=> 8650,
